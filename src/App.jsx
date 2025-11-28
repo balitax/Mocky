@@ -11,19 +11,21 @@ function App() {
     type: 'users',
     count: 10,
     relational: false,
-    customTemplate: '{\n  "name": "Example Item",\n  "status": "active"\n}'
+    relationMode: 'single', // 'single' | 'nested' | 'multi'
+    customTemplate: '{}'
   });
   const [data, setData] = useState(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [toast, setToast] = useState(null);
 
   const handleGenerate = () => {
-    const count = parseInt(config.count);
-    if (isNaN(count) || count < 1 || count > 500) {
+    // Validate count
+    if (config.count < 1 || config.count > 500) {
       setToast({ message: 'Please enter a count between 1 and 500.', type: 'error' });
       return;
     }
 
+    // Validate custom JSON if type is custom
     if (config.type === 'custom') {
       try {
         JSON.parse(config.customTemplate);
@@ -37,7 +39,7 @@ function App() {
     // Simulate a small delay for "vibe"
     setTimeout(() => {
       try {
-        const generatedData = generateData(config.type, count, config.relational, config.customTemplate);
+        const generatedData = generateData(config.type, config.count, config.relational, config.customTemplate, config.relationMode);
         setData(generatedData);
         setToast({ message: 'Data generated successfully!', type: 'success' });
       } catch (error) {

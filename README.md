@@ -19,7 +19,10 @@
 ### 🚀 Core Capabilities
 - ✅ **100% Client-Side** - No backend required, works offline
 - ✅ **Flexible Count** - Generate 1-500 items per dataset
-- ✅ **Relational Mode** - Automatic foreign key relationships
+- ✅ **Enhanced Relational Mode** - Three output modes for complex relationships
+  - **Single Mode** - Foreign keys only (traditional database style)
+  - **Nested Mode** - Embedded related objects (GraphQL style)
+  - **Multi Mode** - All related datasets in one response
 - ✅ **Custom JSON Editor** - 300px editor with line numbers & beautify
 - ✅ **Multiple Export Formats** - JSON, CSV, XML, TypeScript interface
 - ✅ **Export Options** - Copy to clipboard or download files
@@ -48,13 +51,39 @@ Open [http://localhost:5173](http://localhost:5173) in your browser.
 1. Select a dataset type from the dropdown
 2. Enter the number of items (1-500)
 3. Click "Generate JSON"
-4. Copy or download the generated data
+4. Copy or download the### Generate with Relations
+Enable relational mode to generate complete, interconnected datasets:
 
-### Relational Mode
-Enable relational mode to generate data with foreign key relationships:
-- Products will include `sellerId` linking to users
-- Transactions will include `userId` 
-- Comments will include `postId` and `userId`
+**Three Output Modes:**
+
+1. **Single Mode** - Foreign keys only
+   ```json
+   [{ "id": "prod_1", "sellerId": "usr_1", "name": "Laptop" }]
+   ```
+
+2. **Nested Mode** - Embedded objects
+   ```json
+   [{
+     "id": "prod_1",
+     "sellerId": "usr_1",
+     "user": { "id": "usr_1", "name": "John Doe" },
+     "name": "Laptop"
+   }]
+   ```
+
+3. **Multi Mode** - All related datasets
+   ```json
+   {
+     "products": [{ "id": "prod_1", "sellerId": "usr_1" }],
+     "users": [{ "id": "usr_1", "name": "John Doe" }]
+   }
+   ```
+
+**Supported Relationships:**
+- Products → Users (3:1 ratio)
+- Posts → Users (5:1 ratio)
+- Comments → Posts + Users (5:1 ratio)
+- Transactions → Users (10:1 ratio)
 
 ### Custom Datasets
 1. Select "Custom Dataset"
@@ -130,6 +159,7 @@ theme: {
 - **Styling**: Tailwind CSS v4
 - **Language**: JavaScript (ES6+)
 - **Build Tool**: Vite
+- **Data Engine**: Custom relational data generator
 - **No external APIs** - Pure client-side generation
 
 ## 📝 Example Output

@@ -8,61 +8,122 @@ import { generateCompanies } from './generators/companies';
 import { generateAddresses } from './generators/addresses';
 import { generateTransactions } from './generators/transactions';
 import { generateEvents } from './generators/events';
+import { RELATIONSHIPS, calculateRelatedCounts } from './relationships';
 
-export const generateData = (type, count, relational = false, customTemplate = '{}') => {
-    let data = [];
-
-    // If relational is true, we might need to generate auxiliary data
-    // For MVP simplicity, if relational is on, we generate a small set of "parents" 
-    // if the requested type is a "child" type, or just generate the requested type with internal consistency.
-
-    // However, the prompt asks for: users -> own products -> have comments
-    // So if I generate Products with relational=true, I should probably generate some users first to link them.
-    // But the output should be just the requested dataset.
-    // So:
-    // If type is Products and relational is true: generate fake user IDs and assign them.
-    // If type is Comments and relational is true: generate fake user IDs and post IDs.
-
-    // Actually, to make it "realistic" without returning the whole DB:
-    // We can just generate a pool of IDs to pick from.
-
-    const userIds = relational ? Array.from({ length: 50 }, (_, i) => `usr_${i}`) : [];
-    const postIds = relational ? Array.from({ length: 50 }, (_, i) => `post_${i}`) : [];
-
-    switch (type) {
-        case 'users':
-            data = generateUsers(count);
-            break;
-        case 'products':
-            data = generateProducts(count, userIds);
-            break;
-        case 'posts':
-            data = generatePosts(count, userIds);
-            break;
-        case 'comments':
-            data = generateComments(count, postIds, userIds);
-            break;
-        case 'schedules':
-            data = generateSchedules(count);
-            break;
-        case 'companies':
-            data = generateCompanies(count);
-            break;
-        case 'addresses':
-            data = generateAddresses(count);
-            break;
-        case 'transactions':
-            data = generateTransactions(count, userIds);
-            break;
-        case 'events':
-            data = generateEvents(count);
-            break;
-        case 'custom':
-            data = generateCustom(count, customTemplate);
-            break;
-        default:
-            data = [];
+// Simple generation without relationships
+export const generateData = (type, count, relational = false, customTemplate = '{}', relationMode = 'single') => {
+    if (!relational) {
+        // Non-relational mode - simple generation
+        return generateSimple(type, count, customTemplate);
     }
 
-    return data;
+    // Relational mode with different output modes
+    return generateRelational(type, count, relationMode, customTemplate);
+};
+
+// Generate data without relationships
+const generateSimple = (type, count, customTemplate) => {
+    switch (type) {
+        case 'users':
+            return generateUsers(count);
+        case 'products':
+            return generateProducts(count, []);
+        case 'posts':
+            return generatePosts(count, []);
+        case 'comments':
+            return generateComments(count, [], []);
+        case 'schedules':
+            return generateSchedules(count);
+        case 'companies':
+            return generateCompanies(count);
+        case 'addresses':
+            return generateAddresses(count);
+        case 'transactions':
+            return generateTransactions(count, []);
+        case 'events':
+            return generateEvents(count);
+        case 'custom':
+            return generateCustom(count, customTemplate);
+        default:
+            return [];
+    }
+};
+
+// Generate data with relationships
+const generateRelational = (type, count, mode, customTemplate) => {
+    const config = RELATIONSHIPS[type];
+
+    if (!config || config.requires.length === 0) {
+        // No relationships needed, generate normally
+        return generateSimple(type, count, customTemplate);
+    }
+
+    // Calculate how many related entities we need
+    const relatedCounts = calculateRelatedCounts(type, count);
+
+    // Generate all required related datasets
+    const relatedData = {};
+    config.requires.forEach(relatedType => {
+        relatedData[relatedType] = generateSimple(relatedType, relatedCounts[relatedType]);
+    });
+
+    // Generate the main dataset with foreign keys
+    let mainData;
+    const userIds = relatedData.users ? relatedData.users.map(u => u.id) : [];
+    const postIds = relatedData.posts ? relatedData.posts.map(p => p.id) : [];
+
+    switch (type) {
+        case 'products':
+            mainData = generateProducts(count, userIds);
+            break;
+        case 'posts':
+            mainData = generatePosts(count, userIds);
+            break;
+        case 'comments':
+            mainData = generateComments(count, postIds, userIds);
+            break;
+        case 'transactions':
+            mainData = generateTransactions(count, userIds);
+            break;
+        default:
+            mainData = generateSimple(type, count, customTemplate);
+    }
+
+    // Return based on mode
+    if (mode === 'nested') {
+        return embedRelatedData(mainData, relatedData, config);
+    }
+
+    if (mode === 'multi') {
+        return {
+            [type]: mainData,
+            ...relatedData
+        };
+    }
+
+    // Default: single mode (just foreign keys)
+    return mainData;
+};
+
+// Embed related objects into main data
+const embedRelatedData = (mainData, relatedData, config) => {
+    return mainData.map(item => {
+        const embedded = { ...item };
+
+        config.foreignKeys.forEach(fk => {
+            const relatedType = fk.references;
+            const relatedItems = relatedData[relatedType];
+
+            if (relatedItems) {
+                const relatedItem = relatedItems.find(r => r.id === item[fk.field]);
+                if (relatedItem) {
+                    // Add the full object with a descriptive key
+                    const embeddedKey = relatedType.slice(0, -1); // users -> user
+                    embedded[embeddedKey] = relatedItem;
+                }
+            }
+        });
+
+        return embedded;
+    });
 };

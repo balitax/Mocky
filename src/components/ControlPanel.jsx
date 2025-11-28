@@ -150,9 +150,34 @@ const ControlPanel = ({ config, setConfig, onGenerate, isGenerating }) => {
                 </div>
                 <div className="ml-3 text-sm">
                     <label htmlFor="relational" className="font-medium text-gray-700 cursor-pointer select-none">Enable Relational Mode</label>
-                    <p className="text-gray-500 text-xs">Includes foreign keys and realistic links between data.</p>
+                    <p className="text-gray-500 text-xs">Generate related datasets with foreign keys.</p>
                 </div>
             </div>
+
+            {/* Relation Mode Selector */}
+            {config.relational && (
+                <div className="mt-4 ml-8">
+                    <label htmlFor="relationMode" className="block text-sm font-medium text-gray-700 mb-2">
+                        Relationship Output Mode
+                    </label>
+                    <select
+                        id="relationMode"
+                        name="relationMode"
+                        value={config.relationMode}
+                        onChange={handleChange}
+                        className="block w-full max-w-xs pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors cursor-pointer"
+                    >
+                        <option value="single">Single - Foreign Keys Only</option>
+                        <option value="nested">Nested - Embed Related Objects</option>
+                        <option value="multi">Multi - All Related Datasets</option>
+                    </select>
+                    <p className="mt-1 text-xs text-gray-500">
+                        {config.relationMode === 'single' && 'Returns only the requested dataset with foreign key IDs'}
+                        {config.relationMode === 'nested' && 'Embeds full related objects within each item'}
+                        {config.relationMode === 'multi' && 'Returns all related datasets in a single response'}
+                    </p>
+                </div>
+            )}
         </div>
     );
 };
