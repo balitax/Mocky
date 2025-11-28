@@ -2,6 +2,18 @@
 
 > A powerful client-side web application for generating realistic mock datasets instantly. Perfect for prototyping, testing, and development.
 
+## 📋 Table of Contents
+
+- [✨ Features](#-features)
+- [🚀 Quick Start](#-quick-start)
+- [📖 Usage](#-usage)
+- [🏗️ Project Structure](#️-project-structure)
+- [🎨 Customization](#-customization)
+- [🛠️ Tech Stack](#️-tech-stack)
+- [📝 Example Output](#-example-output)
+- [🤝 Contributing](#-contributing)
+- [📄 License](#-license)
+
 ## ✨ Features
 
 ### 🎯 10 Dataset Types
@@ -41,9 +53,23 @@ npm run dev
 
 # Build for production
 npm run build
+
+# Preview production build
+npm run preview
 ```
 
 Open [http://localhost:5173](http://localhost:5173) in your browser.
+
+## 🚀 Deployment
+
+Mocky is a static web application that can be deployed to any static hosting service:
+
+- **Vercel**: Connect your GitHub repo and deploy automatically
+- **Netlify**: Drag & drop the `dist` folder or connect via Git
+- **GitHub Pages**: Use GitHub Actions for automated deployment
+- **Surge**: Run `surge dist` for instant deployment
+
+The app works entirely client-side with no backend requirements.
 
 ## 📖 Usage
 
@@ -51,7 +77,9 @@ Open [http://localhost:5173](http://localhost:5173) in your browser.
 1. Select a dataset type from the dropdown
 2. Enter the number of items (1-500)
 3. Click "Generate JSON"
-4. Copy or download the### Generate with Relations
+4. Copy or download the data
+
+### Generate with Relations
 Enable relational mode to generate complete, interconnected datasets:
 
 **Three Output Modes:**
