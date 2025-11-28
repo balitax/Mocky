@@ -4,7 +4,7 @@ const firstNames = ['James', 'Mary', 'Robert', 'Patricia', 'John', 'Jennifer', '
 const lastNames = ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller', 'Davis', 'Rodriguez', 'Martinez', 'Hernandez', 'Lopez', 'Gonzalez', 'Wilson', 'Anderson', 'Thomas', 'Taylor', 'Moore', 'Jackson', 'Martin'];
 const domains = ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'example.com'];
 const cities = ['New York', 'Los Angeles', 'Chicago', 'Houston', 'Phoenix', 'Philadelphia', 'San Antonio', 'San Diego', 'Dallas', 'San Jose'];
-const roles = ['Admin', 'User', 'Editor', 'Viewer', 'Moderator'];
+const roles = ['Admin', 'User', 'Editor', 'Viewer', 'Moderator', 'Manager', 'Supervisor', 'Director', 'CEO', 'CTO', 'Developer', 'Designer', 'Analyst', 'Coordinator'];
 
 export const generateUsers = (count) => {
     return Array.from({ length: count }, () => {
