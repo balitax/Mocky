@@ -3,7 +3,6 @@ import Layout from './components/Layout';
 import ControlPanel from './components/ControlPanel';
 import JsonViewer from './components/JsonViewer';
 import ApiPreview from './components/ApiPreview';
-import ValidationPanel from './components/ValidationPanel';
 import Toast from './components/Toast';
 import { generateData } from './data-engine';
 
@@ -18,7 +17,15 @@ function App() {
   const [data, setData] = useState(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [toast, setToast] = useState(null);
-  const [showValidation, setShowValidation] = useState(false);
+
+  const generateRandomEndpoint = () => {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let result = '';
+    for (let i = 0; i < 10; i++) {
+      result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return result;
+  };
 
   const handleGenerate = () => {
     // Validate count
@@ -38,11 +45,15 @@ function App() {
     }
 
     setIsGenerating(true);
+    
+    // Generate unique endpoint for custom datasets
+    const customEndpoint = config.type === 'custom' ? generateRandomEndpoint() : config.type;
+
     // Simulate a small delay for "vibe"
     setTimeout(() => {
       try {
         const generatedData = generateData(config.type, config.count, config.relational, config.customTemplate, config.relationMode);
-        setData(generatedData);
+        setData({ ...generatedData, _endpoint: customEndpoint });
         setToast({ message: 'Data generated successfully!', type: 'success' });
       } catch (error) {
         setToast({ message: 'An error occurred during generation.', type: 'error' });
@@ -69,23 +80,8 @@ function App() {
 
       {data && (
         <>
-          <ApiPreview type={config.type} />
+          <ApiPreview type={config.type} data={data} />
           <JsonViewer data={data} onReset={handleReset} setToast={setToast} />
-          <div className="flex justify-center mt-6">
-            <button
-              onClick={() => setShowValidation(!showValidation)}
-              className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg font-medium transition-colors"
-            >
-              {showValidation ? 'Hide Validation' : 'Show Data Validation'}
-            </button>
-          </div>
-          {showValidation && (
-            <ValidationPanel 
-              data={data} 
-              dataType={config.type} 
-              onClose={() => setShowValidation(false)} 
-            />
-          )}
         </>
       )}
     </Layout>

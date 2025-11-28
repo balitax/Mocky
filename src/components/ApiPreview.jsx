@@ -1,7 +1,9 @@
 import React from 'react';
 
-const ApiPreview = ({ type }) => {
-    const endpoint = `/api/${type}`;
+const ApiPreview = ({ type, data }) => {
+    // Use custom endpoint if available (for custom datasets), otherwise use type
+    const endpointName = data && data._endpoint ? data._endpoint : type;
+    const endpoint = `/api/${endpointName}`;
 
     return (
         <div className="mt-8 bg-gray-800 rounded-lg p-4 flex items-center justify-between shadow-lg border border-gray-700">

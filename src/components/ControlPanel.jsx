@@ -94,23 +94,37 @@ const ControlPanel = ({ config, setConfig, onGenerate, isGenerating }) => {
                         <label htmlFor="customTemplate" className="block text-sm font-medium text-gray-700">
                             Custom JSON Template <span className="text-gray-400 text-xs">(Single Object)</span>
                         </label>
-                        <button
-                            type="button"
-                            onClick={() => {
-                                try {
-                                    const parsed = JSON.parse(config.customTemplate);
+                        <div className="flex gap-2">
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    try {
+                                        const parsed = JSON.parse(config.customTemplate);
+                                        setConfig(prev => ({
+                                            ...prev,
+                                            customTemplate: JSON.stringify(parsed, null, 2)
+                                        }));
+                                    } catch (e) {
+                                        // Ignore invalid JSON
+                                    }
+                                }}
+                                className="text-xs bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-2 py-1 rounded transition-colors font-medium"
+                            >
+                                Beautify JSON
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => {
                                     setConfig(prev => ({
                                         ...prev,
-                                        customTemplate: JSON.stringify(parsed, null, 2)
+                                        customTemplate: '{}'
                                     }));
-                                } catch (e) {
-                                    // Ignore invalid JSON
-                                }
-                            }}
-                            className="text-xs bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-2 py-1 rounded transition-colors font-medium"
-                        >
-                            Beautify JSON
-                        </button>
+                                }}
+                                className="text-xs bg-red-50 text-red-600 hover:bg-red-100 px-2 py-1 rounded transition-colors font-medium"
+                            >
+                                Reset
+                            </button>
+                        </div>
                     </div>
                     <div className="flex border border-gray-300 rounded-lg overflow-hidden bg-gray-900 focus-within:ring-2 focus-within:ring-indigo-500 focus-within:border-indigo-500">
                         <div

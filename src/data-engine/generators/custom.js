@@ -1,5 +1,3 @@
-import { randomId } from '../../utils/randomizers';
-
 export const generateCustom = (count, template) => {
     let parsedTemplate = {};
     try {
@@ -9,17 +7,17 @@ export const generateCustom = (count, template) => {
         parsedTemplate = { error: "Invalid JSON template" };
     }
 
-    return Array.from({ length: count }, () => {
-        // Deep clone the template for each item to avoid reference issues
-        // For MVP, we just replicate the static data. 
-        // If we wanted to be fancy, we could look for special strings like "{{name}}" and replace them.
-        // But the prompt says "user can input their own json", implying replication or simple structure.
-        // Let's add a unique ID to make it a list of distinct objects at least.
+    // If the parsed template is an array, return it as-is
+    if (Array.isArray(parsedTemplate)) {
+        return parsedTemplate;
+    }
 
-        const item = JSON.parse(JSON.stringify(parsedTemplate));
-        if (typeof item === 'object' && item !== null && !item.id) {
-            item.id = randomId('custom');
-        }
-        return item;
-    });
+    // If the parsed template is a single object, return it directly
+    // This preserves the user's input structure as expected
+    if (typeof parsedTemplate === 'object' && parsedTemplate !== null) {
+        return parsedTemplate;
+    }
+
+    // For primitive values, wrap in an object with the value
+    return { value: parsedTemplate };
 };
