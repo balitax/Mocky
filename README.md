@@ -1,16 +1,175 @@
-# React + Vite
+# Mocky - Dummy Data API Generator
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+> A powerful client-side web application for generating realistic mock datasets instantly. Perfect for prototyping, testing, and development.
 
-Currently, two official plugins are available:
+## ✨ Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### 🎯 10 Dataset Types
+- **User Profiles** - Complete user data with names, emails, roles, avatars
+- **Product Catalog** - E-commerce products with prices, categories, stock
+- **Blog Posts** - Articles with titles, content, tags, engagement metrics
+- **Comments** - User comments with timestamps and relationships
+- **Classroom Schedules** - Educational schedules with subjects, teachers, rooms
+- **Companies** - Business data with revenue, employees, industry info
+- **Addresses** - Full addresses with coordinates
+- **Transactions** - Financial transactions with payment methods
+- **Events** - Event details with dates, capacity, pricing
+- **Custom Dataset** - Define your own JSON templates
 
-## React Compiler
+### 🚀 Core Capabilities
+- ✅ **100% Client-Side** - No backend required, works offline
+- ✅ **Flexible Count** - Generate 1-500 items per dataset
+- ✅ **Relational Mode** - Automatic foreign key relationships
+- ✅ **Custom JSON Editor** - 300px editor with line numbers & beautify
+- ✅ **Multiple Export Formats** - JSON, CSV, XML, TypeScript interface
+- ✅ **Export Options** - Copy to clipboard or download files
+- ✅ **Mock API Preview** - Dynamic endpoint URLs
+- ✅ **Input Validation** - Smart error handling with toast notifications
+- ✅ **Modern UI** - Clean, responsive design
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 🚀 Quick Start
 
-## Expanding the ESLint configuration
+```bash
+# Install dependencies
+npm install
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+# Start development server
+npm run dev
+
+# Build for production
+npm run build
+```
+
+Open [http://localhost:5173](http://localhost:5173) in your browser.
+
+## 📖 Usage
+
+### Basic Generation
+1. Select a dataset type from the dropdown
+2. Enter the number of items (1-500)
+3. Click "Generate JSON"
+4. Copy or download the generated data
+
+### Relational Mode
+Enable relational mode to generate data with foreign key relationships:
+- Products will include `sellerId` linking to users
+- Transactions will include `userId` 
+- Comments will include `postId` and `userId`
+
+### Custom Datasets
+1. Select "Custom Dataset"
+2. Enter your JSON template in the editor
+3. Use "Beautify JSON" to format
+4. Generate - each item gets a unique ID
+
+**Example Template:**
+```json
+{
+  "name": "Example Item",
+  "status": "active",
+  "priority": 1
+}
+```
+
+## 🏗️ Project Structure
+
+```
+mocky/
+├── src/
+│   ├── components/          # React components
+│   │   ├── Layout.jsx       # Main layout wrapper
+│   │   ├── ControlPanel.jsx # Generation controls
+│   │   ├── JsonViewer.jsx   # JSON display with actions
+│   │   ├── ApiPreview.jsx   # Mock endpoint preview
+│   │   └── Toast.jsx        # Notification system
+│   ├── data-engine/         # Data generation logic
+│   │   ├── generators/      # 10 dataset generators
+│   │   │   ├── users.js
+│   │   │   ├── products.js
+│   │   │   ├── posts.js
+│   │   │   ├── comments.js
+│   │   │   ├── schedules.js
+│   │   │   ├── companies.js
+│   │   │   ├── addresses.js
+│   │   │   ├── transactions.js
+│   │   │   ├── events.js
+│   │   │   └── custom.js
+│   │   └── index.js         # Main generation entry
+│   ├── utils/
+│   │   └── randomizers.js   # Helper functions
+│   ├── App.jsx              # Main app component
+│   └── index.css            # Tailwind styles
+├── tailwind.config.js       # Custom green theme
+└── package.json
+```
+
+## 🎨 Customization
+
+### Change Theme Color
+Edit `tailwind.config.js` to customize the color scheme:
+
+```javascript
+theme: {
+  extend: {
+    colors: {
+      // Add your custom colors here
+    }
+  }
+}
+```
+
+### Add New Dataset Type
+1. Create generator in `src/data-engine/generators/yourtype.js`
+2. Import in `src/data-engine/index.js`
+3. Add case in switch statement
+4. Add option in `src/components/ControlPanel.jsx`
+
+## 🛠️ Tech Stack
+
+- **Framework**: React 19 + Vite 7
+- **Styling**: Tailwind CSS v4
+- **Language**: JavaScript (ES6+)
+- **Build Tool**: Vite
+- **No external APIs** - Pure client-side generation
+
+## 📝 Example Output
+
+```json
+[
+  {
+    "id": "comp_x7k2m9p",
+    "name": "Tech Solutions Inc.",
+    "industry": "Technology",
+    "founded": 2015,
+    "employees": 250,
+    "revenue": 5000000,
+    "isPublic": true,
+    "website": "https://techsolutionsinc.com",
+    "headquarters": "San Francisco",
+    "createdAt": "2024-03-15T10:30:00.000Z"
+  }
+]
+```
+
+## 🤝 Contributing
+
+This is a personal project, but suggestions are welcome! Feel free to:
+- Report bugs
+- Suggest new dataset types
+- Propose UI improvements
+
+## 📄 License
+
+MIT License - Feel free to use this project for your own purposes.
+
+## 🙏 Acknowledgments
+
+Built with modern web technologies and a focus on developer experience. Perfect for:
+- Frontend developers testing UI components
+- Backend developers mocking API responses
+- QA teams generating test data
+- Designers prototyping with realistic content
+
+---
+
+**Made with ❤️ using React + Vite + Tailwind CSS**
