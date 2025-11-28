@@ -68,7 +68,7 @@ function App() {
       {data && (
         <>
           <ApiPreview type={config.type} />
-          <JsonViewer data={data} onReset={handleReset} />
+          <JsonViewer data={data} onReset={handleReset} setToast={setToast} />
         </>
       )}
     </Layout>

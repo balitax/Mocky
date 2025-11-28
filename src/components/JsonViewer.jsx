@@ -10,7 +10,7 @@ import {
     jsonToSQLCreateTable
 } from '../utils/exporters';
 
-const JsonViewer = ({ data, onReset }) => {
+const JsonViewer = ({ data, onReset, setToast }) => {
     const [copied, setCopied] = useState(false);
     const [exportFormat, setExportFormat] = useState('json');
     const [sqlDialect, setSqlDialect] = useState('mysql');
@@ -63,17 +63,18 @@ const JsonViewer = ({ data, onReset }) => {
     };
 
     const getDownloadLabel = () => {
+        const fileName = getDownloadFileName();
         switch (exportFormat) {
-            case 'csv': return 'Download CSV';
-            case 'tsv': return 'Download TSV';
-            case 'xml': return 'Download XML';
-            case 'typescript': return 'Download TS';
-            case 'sql': return 'Download SQL';
-            case 'sql-insert': return 'Download SQL';
-            case 'sql-createtable': return 'Download SQL';
-            case 'mysql-dump': return 'Download SQL';
+            case 'csv': return `Download ${fileName}`;
+            case 'tsv': return `Download ${fileName}`;
+            case 'xml': return `Download ${fileName}`;
+            case 'typescript': return `Download ${fileName}`;
+            case 'sql': return `Download ${fileName}`;
+            case 'sql-insert': return `Download ${fileName}`;
+            case 'sql-createtable': return `Download ${fileName}`;
+            case 'mysql-dump': return `Download ${fileName}`;
             case 'json':
-            default: return 'Download JSON';
+            default: return `Download ${fileName}`;
         }
     };
 
@@ -81,6 +82,38 @@ const JsonViewer = ({ data, onReset }) => {
         navigator.clipboard.writeText(getExportData());
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
+        setToast({ 
+            message: `${exportFormat.toUpperCase()} data copied to clipboard!`, 
+            type: 'success' 
+        });
+    };
+
+    const getDownloadFileName = () => {
+        const timestamp = new Date().toISOString().slice(0, 10);
+        const baseName = 'mock-data';
+        
+        switch (exportFormat) {
+            case 'json':
+                return `${baseName}.json`;
+            case 'csv':
+                return `${baseName}.csv`;
+            case 'tsv':
+                return `${baseName}.tsv`;
+            case 'xml':
+                return `${baseName}.xml`;
+            case 'typescript':
+                return `${baseName}.ts`;
+            case 'sql':
+                return `${baseName}-${sqlDialect}.sql`;
+            case 'sql-insert':
+                return `${baseName}-insert-${sqlDialect}.sql`;
+            case 'sql-createtable':
+                return `${baseName}-create-${sqlDialect}.sql`;
+            case 'mysql-dump':
+                return `${baseName}-dump.sql`;
+            default:
+                return `${baseName}.txt`;
+        }
     };
 
     const handleDownload = () => {
@@ -90,11 +123,23 @@ const JsonViewer = ({ data, onReset }) => {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `mock-data.${getFileExtension()}`;
+        a.download = getDownloadFileName();
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
+        setToast({ 
+            message: `${getDownloadFileName()} downloaded successfully!`, 
+            type: 'success' 
+        });
+    };
+
+    const handleResetWithNotification = () => {
+        onReset();
+        setToast({ 
+            message: 'Generated data cleared successfully!', 
+            type: 'success' 
+        });
     };
 
     const isSQLFormat = exportFormat.startsWith('sql');
@@ -122,7 +167,7 @@ const JsonViewer = ({ data, onReset }) => {
                             {getDownloadLabel()}
                         </button>
                         <button
-                            onClick={onReset}
+                            onClick={handleResetWithNotification}
                             className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
                         >
                             Reset
@@ -139,7 +184,13 @@ const JsonViewer = ({ data, onReset }) => {
                         <select
                             id="exportFormat"
                             value={exportFormat}
-                            onChange={(e) => setExportFormat(e.target.value)}
+                            onChange={(e) => {
+                                setExportFormat(e.target.value);
+                                setToast({ 
+                                    message: `Export format changed to ${e.target.value.toUpperCase()}`, 
+                                    type: 'success' 
+                                });
+                            }}
                             className="text-sm border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
                         >
                             <option value="json">JSON</option>
