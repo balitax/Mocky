@@ -3,6 +3,7 @@ import Layout from './components/Layout';
 import ControlPanel from './components/ControlPanel';
 import JsonViewer from './components/JsonViewer';
 import ApiPreview from './components/ApiPreview';
+import ValidationPanel from './components/ValidationPanel';
 import Toast from './components/Toast';
 import { generateData } from './data-engine';
 
@@ -17,6 +18,7 @@ function App() {
   const [data, setData] = useState(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [toast, setToast] = useState(null);
+  const [showValidation, setShowValidation] = useState(false);
 
   const handleGenerate = () => {
     // Validate count
@@ -69,6 +71,21 @@ function App() {
         <>
           <ApiPreview type={config.type} />
           <JsonViewer data={data} onReset={handleReset} setToast={setToast} />
+          <div className="flex justify-center mt-6">
+            <button
+              onClick={() => setShowValidation(!showValidation)}
+              className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg font-medium transition-colors"
+            >
+              {showValidation ? 'Hide Validation' : 'Show Data Validation'}
+            </button>
+          </div>
+          {showValidation && (
+            <ValidationPanel 
+              data={data} 
+              dataType={config.type} 
+              onClose={() => setShowValidation(false)} 
+            />
+          )}
         </>
       )}
     </Layout>
