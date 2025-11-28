@@ -21,24 +21,24 @@ const JsonViewer = ({ data, onReset, setToast }) => {
         const formatForDialect = (dialect) => {
             switch (exportFormat) {
                 case 'csv':
-                    return jsonToCSV(data);
+                    return jsonToCSV(actualData);
                 case 'tsv':
-                    return jsonToTSV(data);
+                    return jsonToTSV(actualData);
                 case 'xml':
-                    return jsonToXML(data);
+                    return jsonToXML(actualData);
                 case 'typescript':
-                    return jsonToTypeScript(data);
+                    return jsonToTypeScript(actualData);
                 case 'sql':
-                    return jsonToSQL(data, tableName, dialect);
+                    return jsonToSQL(actualData, tableName, dialect);
                 case 'sql-insert':
-                    return jsonToSQLInsert(data, tableName);
+                    return jsonToSQLInsert(actualData, tableName);
                 case 'sql-createtable':
-                    return jsonToSQLCreateTable(data, tableName, dialect);
+                    return jsonToSQLCreateTable(actualData, tableName, dialect);
                 case 'mysql-dump':
-                    return jsonToMySQLDump(data, tableName);
+                    return jsonToMySQLDump(actualData, tableName);
                 case 'json':
                 default:
-                    return JSON.stringify(data, null, 2);
+                    return JSON.stringify(actualData, null, 2);
             }
         };
 
@@ -132,7 +132,7 @@ const JsonViewer = ({ data, onReset, setToast }) => {
 
     if (!data) return null;
 
-    const displayData = getExportData();
+    const previewData = JSON.stringify(actualData, null, 2);
 
     return (
         <div className="modern-card overflow-hidden mt-8 animate-fade-in-up">
@@ -230,12 +230,12 @@ const JsonViewer = ({ data, onReset, setToast }) => {
             {/* Data Preview */}
             <div className="p-0 overflow-auto max-h-[600px] bg-gray-900 flex text-sm font-mono leading-relaxed">
                 <div className="py-6 pl-4 pr-2 text-right text-gray-500 select-none border-r border-gray-800 bg-gray-900 sticky left-0 min-w-[3rem]">
-                    {displayData.split('\n').map((_, i) => (
+                    {previewData.split('\n').map((_, i) => (
                         <div key={i}>{i + 1}</div>
                     ))}
                 </div>
                 <pre className="py-6 pl-4 pr-6 text-green-400 flex-1">
-                    {displayData}
+                    {previewData}
                 </pre>
             </div>
         </div>
