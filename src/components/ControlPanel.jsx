@@ -22,7 +22,7 @@ const ControlPanel = ({ config, setConfig, onGenerate, isGenerating }) => {
     const lines = Array.from({ length: Math.max(5, lineCount) }, (_, i) => i + 1);
 
     return (
-        <div className="bg-white shadow-xl rounded-2xl p-6 md:p-8 transition-all duration-300 hover:shadow-2xl border border-gray-100">
+        <div className="modern-card p-8 md:p-10 animate-fade-in-up">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
 
                 {/* Dataset Type Selector */}
@@ -33,7 +33,7 @@ const ControlPanel = ({ config, setConfig, onGenerate, isGenerating }) => {
                         name="type"
                         value={config.type}
                         onChange={handleChange}
-                        className="block w-full pl-3 pr-10 py-3 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors cursor-pointer"
+                        className="dropdown-modern w-full"
                     >
                         <option value="users">User Profiles</option>
                         <option value="products">Product Catalog</option>
@@ -49,30 +49,28 @@ const ControlPanel = ({ config, setConfig, onGenerate, isGenerating }) => {
                 </div>
 
                 {/* Count Input */}
-                {config.type !== 'custom' && (
-                    <div className="col-span-1">
-                        <label htmlFor="count" className="block text-sm font-medium text-gray-700 mb-2">
-                            Count <span className="text-gray-400 text-xs">(1-500)</span>
-                        </label>
-                        <input
-                            type="number"
-                            name="count"
-                            id="count"
-                            min="1"
-                            max="500"
-                            value={config.count}
-                            onChange={handleChange}
-                            className="block w-full pl-4 pr-4 py-3 border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-gray-50"
-                        />
-                    </div>
-                )}
+                <div className="col-span-1">
+                    <label htmlFor="count" className="block text-sm font-medium text-gray-700 mb-2">
+                        Count <span className="text-gray-400 text-xs">(1-500)</span>
+                    </label>
+                    <input
+                        type="number"
+                        name="count"
+                        id="count"
+                        min="1"
+                        max="500"
+                        value={config.count}
+                        onChange={handleChange}
+                        className="input-modern w-full"
+                    />
+                </div>
 
                 {/* Generate Button */}
                 <div className="col-span-1 flex flex-col justify-end h-full">
                     <button
                         onClick={onGenerate}
                         disabled={isGenerating}
-                        className={`w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200 transform active:scale-95 ${isGenerating ? 'opacity-75 cursor-not-allowed' : ''}`}
+                        className={`modern-button w-full ${isGenerating ? 'opacity-75 cursor-not-allowed' : ''}`}
                     >
                         {isGenerating ? (
                             <span className="flex items-center">
@@ -104,7 +102,7 @@ const ControlPanel = ({ config, setConfig, onGenerate, isGenerating }) => {
                                             ...prev,
                                             customTemplate: JSON.stringify(parsed, null, 2)
                                         }));
-                                    } catch (e) {
+                                    } catch {
                                         // Ignore invalid JSON
                                     }
                                 }}
@@ -179,7 +177,7 @@ const ControlPanel = ({ config, setConfig, onGenerate, isGenerating }) => {
                         name="relationMode"
                         value={config.relationMode}
                         onChange={handleChange}
-                        className="block w-full max-w-xs pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors cursor-pointer"
+                        className="dropdown-modern w-full max-w-xs"
                     >
                         <option value="single">Single - Foreign Keys Only</option>
                         <option value="nested">Nested - Embed Related Objects</option>

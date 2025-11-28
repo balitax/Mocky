@@ -1,28 +1,46 @@
 // Convert JSON to CSV
 export const jsonToCSV = (data) => {
-    if (!data || data.length === 0) return '';
+    if (!data) return '';
 
-    // Get all unique keys from all objects
-    const allKeys = [...new Set(data.flatMap(obj => Object.keys(obj)))];
+    // Handle array data
+    if (Array.isArray(data)) {
+        if (data.length === 0) return '';
 
-    // Create header row
-    const header = allKeys.join(',');
+        // Get all unique keys from all objects
+        const allKeys = [...new Set(data.flatMap(obj => Object.keys(obj)))];
 
-    // Create data rows
-    const rows = data.map(obj => {
-        return allKeys.map(key => {
-            const value = obj[key];
-            // Handle different data types
-            if (value === null || value === undefined) return '';
-            if (typeof value === 'object') return JSON.stringify(value).replace(/"/g, '""');
-            if (typeof value === 'string' && (value.includes(',') || value.includes('"') || value.includes('\n'))) {
-                return `"${value.replace(/"/g, '""')}"`;
+        // Create header row
+        const header = allKeys.join(',');
+
+        // Create data rows
+        const rows = data.map(obj => {
+            return allKeys.map(key => {
+                const value = obj[key];
+                // Handle different data types
+                if (value === null || value === undefined) return '';
+                if (typeof value === 'object') return JSON.stringify(value).replace(/"/g, '""');
+                if (typeof value === 'string' && (value.includes(',') || value.includes('"') || value.includes('\n'))) {
+                    return `"${value.replace(/"/g, '""')}"`;
+                }
+                return value;
+            }).join(',');
+        });
+
+        return [header, ...rows].join('\n');
+    }
+
+    // Handle object data (e.g., multi-relational mode)
+    if (typeof data === 'object') {
+        // Find the first array property and export it
+        for (const key in data) {
+            if (Array.isArray(data[key]) && data[key].length > 0) {
+                return jsonToCSV(data[key]);
             }
-            return value;
-        }).join(',');
-    });
+        }
+        return 'No array data found for CSV export.';
+    }
 
-    return [header, ...rows].join('\n');
+    return 'CSV export requires array data.';
 };
 
 // Convert JSON to XML
@@ -76,10 +94,28 @@ export const jsonToXML = (data, rootName = 'data') => {
 
 // Generate TypeScript interface from JSON
 export const jsonToTypeScript = (data, interfaceName = 'GeneratedData') => {
-    if (!data || data.length === 0) return '';
+    if (!data) return '';
 
-    // Get first item to infer types
-    const sample = data[0];
+    let sample;
+
+    // Handle array data
+    if (Array.isArray(data)) {
+        if (data.length === 0) return '';
+        sample = data[0];
+    } else if (typeof data === 'object') {
+        // Handle object data - find first array or use object directly
+        for (const key in data) {
+            if (Array.isArray(data[key]) && data[key].length > 0) {
+                sample = data[key][0];
+                break;
+            }
+        }
+        if (!sample) {
+            sample = data; // Use the object itself if no arrays found
+        }
+    } else {
+        return 'TypeScript interface generation requires object or array data.';
+    }
 
     const inferType = (value) => {
         if (value === null || value === undefined) return 'any';
@@ -108,9 +144,28 @@ export const jsonToTypeScript = (data, interfaceName = 'GeneratedData') => {
 
 // Generate SQL CREATE TABLE statement
 export const jsonToSQLCreateTable = (data, tableName = 'generated_data', sqlDialect = 'mysql') => {
-    if (!data || data.length === 0) return '';
+    if (!data) return '';
 
-    const sample = data[0];
+    let sample;
+
+    // Handle array data
+    if (Array.isArray(data)) {
+        if (data.length === 0) return '';
+        sample = data[0];
+    } else if (typeof data === 'object') {
+        // Handle object data - find first array
+        for (const key in data) {
+            if (Array.isArray(data[key]) && data[key].length > 0) {
+                sample = data[key][0];
+                break;
+            }
+        }
+        if (!sample) {
+            return 'No array data found for SQL CREATE TABLE.';
+        }
+    } else {
+        return 'SQL CREATE TABLE requires array data.';
+    }
     const typeMapping = {
         'mysql': {
             'string': 'VARCHAR(255)',
@@ -173,8 +228,29 @@ export const jsonToSQLCreateTable = (data, tableName = 'generated_data', sqlDial
 };
 
 // Generate SQL INSERT statements
-export const jsonToSQLInsert = (data, tableName = 'generated_data', sqlDialect = 'mysql') => {
-    if (!data || data.length === 0) return '';
+export const jsonToSQLInsert = (data, tableName = 'generated_data') => {
+    if (!data) return '';
+
+    let arrayData;
+
+    // Handle array data
+    if (Array.isArray(data)) {
+        if (data.length === 0) return '';
+        arrayData = data;
+    } else if (typeof data === 'object') {
+        // Handle object data - find first array
+        for (const key in data) {
+            if (Array.isArray(data[key]) && data[key].length > 0) {
+                arrayData = data[key];
+                break;
+            }
+        }
+        if (!arrayData) {
+            return 'No array data found for SQL INSERT.';
+        }
+    } else {
+        return 'SQL INSERT requires array data.';
+    }
 
     const escapeSQLString = (str) => {
         if (typeof str !== 'string') return str;
@@ -189,13 +265,13 @@ export const jsonToSQLInsert = (data, tableName = 'generated_data', sqlDialect =
         return `'${escapeSQLString(value)}'`;
     };
 
-    const sample = data[0];
+    const sample = arrayData[0];
     const columnNames = Object.keys(sample).map(key => key.replace(/[^a-zA-Z0-9_]/g, '_'));
     const columns = columnNames.join(', ');
 
     let sql = `INSERT INTO ${tableName} (${columns}) VALUES\n`;
 
-    const values = data.map(row => {
+    const values = arrayData.map(row => {
         const rowValues = Object.values(row).map(formatValue);
         return `(${rowValues.join(', ')})`;
     });
@@ -208,47 +284,65 @@ export const jsonToSQLInsert = (data, tableName = 'generated_data', sqlDialect =
 // Generate complete SQL script (CREATE TABLE + INSERT)
 export const jsonToSQL = (data, tableName = 'generated_data', sqlDialect = 'mysql') => {
     const createTable = jsonToSQLCreateTable(data, tableName, sqlDialect);
-    const insertStatements = jsonToSQLInsert(data, tableName, sqlDialect);
-    
+    const insertStatements = jsonToSQLInsert(data, tableName);
+
     return `${createTable}\n\n${insertStatements}`;
 };
 
 // Generate MySQL dump format
 export const jsonToMySQLDump = (data, tableName = 'generated_data') => {
     const timestamp = new Date().toISOString().split('T')[0];
-    
+
     let dump = `-- Mocky Generated MySQL Dump\n`;
     dump += `-- Generated on ${timestamp}\n`;
     dump += `-- Table structure for ${tableName}\n\n`;
-    
+
     dump += `DROP TABLE IF EXISTS ${tableName};\n\n`;
     dump += jsonToSQLCreateTable(data, tableName, 'mysql') + '\n\n';
-    
+
     dump += `-- Dumping data for table ${tableName}\n\n`;
-    dump += jsonToSQLInsert(data, tableName, 'mysql') + '\n';
+    dump += jsonToSQLInsert(data, tableName) + '\n';
 
     return dump;
 };
 
 // Generate TSV (Tab-Separated Values) export
 export const jsonToTSV = (data) => {
-    if (!data || data.length === 0) return '';
+    if (!data) return '';
 
-    // Get all unique keys from all objects
-    const allKeys = [...new Set(data.flatMap(obj => Object.keys(obj)))];
+    // Handle array data
+    if (Array.isArray(data)) {
+        if (data.length === 0) return '';
 
-    // Create header row
-    const header = allKeys.join('\t');
+        // Get all unique keys from all objects
+        const allKeys = [...new Set(data.flatMap(obj => Object.keys(obj)))];
 
-    // Create data rows
-    const rows = data.map(obj => {
-        return allKeys.map(key => {
-            const value = obj[key];
-            if (value === null || value === undefined) return '';
-            if (typeof value === 'object') return JSON.stringify(value);
-            return String(value).replace(/\t/g, ' '); // Replace tabs in values
-        }).join('\t');
-    });
+        // Create header row
+        const header = allKeys.join('\t');
 
-    return [header, ...rows].join('\n');
+        // Create data rows
+        const rows = data.map(obj => {
+            return allKeys.map(key => {
+                const value = obj[key];
+                if (value === null || value === undefined) return '';
+                if (typeof value === 'object') return JSON.stringify(value);
+                return String(value).replace(/\t/g, ' '); // Replace tabs in values
+            }).join('\t');
+        });
+
+        return [header, ...rows].join('\n');
+    }
+
+    // Handle object data (e.g., multi-relational mode)
+    if (typeof data === 'object') {
+        // Find the first array property and export it
+        for (const key in data) {
+            if (Array.isArray(data[key]) && data[key].length > 0) {
+                return jsonToTSV(data[key]);
+            }
+        }
+        return 'No array data found for TSV export.';
+    }
+
+    return 'TSV export requires array data.';
 };

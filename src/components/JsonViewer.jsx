@@ -11,6 +11,7 @@ import {
 } from '../utils/exporters';
 
 const JsonViewer = ({ data, onReset, setToast }) => {
+    const actualData = data && data.data ? data.data : data;
     const [copied, setCopied] = useState(false);
     const [exportFormat, setExportFormat] = useState('json');
     const [sqlDialect, setSqlDialect] = useState('mysql');
@@ -30,7 +31,7 @@ const JsonViewer = ({ data, onReset, setToast }) => {
                 case 'sql':
                     return jsonToSQL(data, tableName, dialect);
                 case 'sql-insert':
-                    return jsonToSQLInsert(data, tableName, dialect);
+                    return jsonToSQLInsert(data, tableName);
                 case 'sql-createtable':
                     return jsonToSQLCreateTable(data, tableName, dialect);
                 case 'mysql-dump':
@@ -47,20 +48,6 @@ const JsonViewer = ({ data, onReset, setToast }) => {
         return formatForDialect('mysql'); // default for non-SQL formats
     };
 
-    const getFileExtension = () => {
-        switch (exportFormat) {
-            case 'csv': return 'csv';
-            case 'tsv': return 'tsv';
-            case 'xml': return 'xml';
-            case 'typescript': return 'ts';
-            case 'sql': return 'sql';
-            case 'sql-insert': return 'sql';
-            case 'sql-createtable': return 'sql';
-            case 'mysql-dump': return 'sql';
-            case 'json':
-            default: return 'json';
-        }
-    };
 
     const getDownloadLabel = () => {
         const fileName = getDownloadFileName();
@@ -89,9 +76,8 @@ const JsonViewer = ({ data, onReset, setToast }) => {
     };
 
     const getDownloadFileName = () => {
-        const timestamp = new Date().toISOString().slice(0, 10);
         const baseName = 'mock-data';
-        
+
         switch (exportFormat) {
             case 'json':
                 return `${baseName}.json`;
@@ -149,10 +135,10 @@ const JsonViewer = ({ data, onReset, setToast }) => {
     const displayData = getExportData();
 
     return (
-        <div className="bg-white shadow-xl rounded-2xl overflow-hidden border border-gray-100 mt-8 transition-all duration-300">
-            <div className="bg-gray-50 px-6 py-4 border-b border-gray-200">
+        <div className="modern-card overflow-hidden mt-8 animate-fade-in-up">
+            <div className="bg-gradient-to-r from-slate-50 to-blue-50 px-8 py-6 border-b border-slate-200/50">
                 <div className="flex justify-between items-center flex-wrap gap-4 mb-4">
-                    <h3 className="text-lg font-medium text-gray-900">Generated Data</h3>
+                    <h3 className="text-xl font-bold gradient-text">Generated Data</h3>
                     <div className="flex space-x-3">
                         <button
                             onClick={handleCopy}
@@ -191,7 +177,7 @@ const JsonViewer = ({ data, onReset, setToast }) => {
                                     type: 'success' 
                                 });
                             }}
-                            className="text-sm border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                            className="dropdown-modern text-sm"
                         >
                             <option value="json">JSON</option>
                             <option value="csv">CSV</option>
@@ -216,7 +202,7 @@ const JsonViewer = ({ data, onReset, setToast }) => {
                                     id="sqlDialect"
                                     value={sqlDialect}
                                     onChange={(e) => setSqlDialect(e.target.value)}
-                                    className="text-sm border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                                    className="dropdown-modern text-sm"
                                 >
                                     <option value="mysql">MySQL</option>
                                     <option value="postgresql">PostgreSQL</option>

@@ -231,7 +231,7 @@ export const importTemplates = (fileContent) => {
         } else {
             return { success: false, error: 'Failed to save imported templates' };
         }
-    } catch (error) {
+    } catch {
         return { success: false, error: 'Invalid JSON file' };
     }
 };

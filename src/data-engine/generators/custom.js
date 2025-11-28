@@ -1,8 +1,10 @@
+import { randomId } from '../../utils/randomizers';
+
 export const generateCustom = (count, template) => {
     let parsedTemplate = {};
     try {
         parsedTemplate = JSON.parse(template);
-    } catch (e) {
+    } catch {
         // Fallback if invalid JSON, though UI should prevent this
         parsedTemplate = { error: "Invalid JSON template" };
     }
@@ -12,12 +14,17 @@ export const generateCustom = (count, template) => {
         return parsedTemplate;
     }
 
-    // If the parsed template is a single object, return it directly
-    // This preserves the user's input structure as expected
+    // If the parsed template is a single object, generate 'count' copies with unique IDs
     if (typeof parsedTemplate === 'object' && parsedTemplate !== null) {
-        return parsedTemplate;
+        return Array.from({ length: count }, () => ({
+            id: randomId('custom'),
+            ...parsedTemplate
+        }));
     }
 
-    // For primitive values, wrap in an object with the value
-    return { value: parsedTemplate };
+    // For primitive values, wrap in an object with the value, and generate count copies with IDs
+    return Array.from({ length: count }, () => ({
+        id: randomId('custom'),
+        value: parsedTemplate
+    }));
 };

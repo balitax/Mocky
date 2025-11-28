@@ -38,7 +38,7 @@ function App() {
     if (config.type === 'custom') {
       try {
         JSON.parse(config.customTemplate);
-      } catch (e) {
+      } catch {
         setToast({ message: 'Invalid JSON template. Please check your syntax.', type: 'error' });
         return;
       }
@@ -53,9 +53,9 @@ function App() {
     setTimeout(() => {
       try {
         const generatedData = generateData(config.type, config.count, config.relational, config.customTemplate, config.relationMode);
-        setData({ ...generatedData, _endpoint: customEndpoint });
+        setData({ data: generatedData, _endpoint: customEndpoint });
         setToast({ message: 'Data generated successfully!', type: 'success' });
-      } catch (error) {
+      } catch {
         setToast({ message: 'An error occurred during generation.', type: 'error' });
       } finally {
         setIsGenerating(false);

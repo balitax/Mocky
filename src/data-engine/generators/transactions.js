@@ -1,4 +1,4 @@
-import { randomInt, randomChoice, randomDate, randomId, randomFloat } from '../../utils/randomizers';
+import { randomChoice, randomDate, randomId, randomFloat } from '../../utils/randomizers';
 
 const types = ['purchase', 'refund', 'transfer', 'deposit', 'withdrawal'];
 const statuses = ['completed', 'pending', 'failed', 'cancelled'];
